@@ -268,8 +268,8 @@
                 <input type="text" id="profileName" placeholder="Your name" readonly style="opacity:0.6;cursor:not-allowed;">
               </div>
               <div class="field">
-                <label>Email</label>
-                <input type="email" id="profileEmail" placeholder="you@example.com" readonly style="opacity:0.6;cursor:not-allowed;">
+                <label>Username</label>
+                <input type="text" id="profileUsername" readonly style="opacity:0.6;cursor:not-allowed;font-family:monospace;">
               </div>
               <div class="field">
                 <label>Contact (phone / social handle)</label>
@@ -508,9 +508,11 @@
     // ── Profile ──
     async function loadProfile() {
       if (!myAffiliator) return;
-      document.getElementById('profileName').value    = myAffiliator.name;
-      document.getElementById('profileEmail').value   = myAffiliator.email;
-      document.getElementById('profileContact').value = myAffiliator.contact || '';
+      document.getElementById('profileName').value     = myAffiliator.name;
+      // Derive username from stored username field or strip @eqstudio.internal from email
+      const username = myAffiliator.username || myAffiliator.email.replace('@eqstudio.internal', '');
+      document.getElementById('profileUsername').value = username;
+      document.getElementById('profileContact').value  = myAffiliator.contact || '';
     }
 
     async function saveProfile() {
