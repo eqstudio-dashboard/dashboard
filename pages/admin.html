@@ -395,16 +395,16 @@
       }
       tbody.innerHTML = list.map(a => `
         <tr>
-          <td>
+          <td data-label="Name">
             <div style="font-weight:500;">${a.name}</div>
             <div class="td-secondary">${a.email}</div>
             ${a.contact ? `<div class="td-secondary" style="font-size:0.75rem;">${a.contact}</div>` : ''}
           </td>
-          <td><span class="td-mono">${a.promo_code}</span></td>
-          <td>${a.code_uses ?? 0}</td>
-          <td class="text-gold" style="font-weight:600;">${formatCurrency(a.total_commission)}</td>
-          <td class="td-secondary">${timeAgo(a.last_active)}</td>
-          <td><span class="badge ${a.status === 'active' ? 'badge-active' : 'badge-inactive'}"><span class="badge-dot"></span>${a.status}</span></td>
+          <td data-label="Promo Code"><span class="td-mono">${a.promo_code}</span></td>
+          <td data-label="Uses">${a.code_uses ?? 0}</td>
+          <td data-label="Commission" class="text-gold" style="font-weight:600;">${formatCurrency(a.total_commission)}</td>
+          <td data-label="Last Active" class="td-secondary">${timeAgo(a.last_active)}</td>
+          <td data-label="Status"><span class="badge ${a.status === 'active' ? 'badge-active' : 'badge-inactive'}"><span class="badge-dot"></span>${a.status}</span></td>
           <td>
             <div class="action-row">
               <button class="btn btn-ghost btn-icon btn-sm" title="Edit stats" onclick="openEditModal('${a.id}','${a.code_uses}','${a.total_commission}','${a.status}')">
@@ -433,11 +433,11 @@
       }
       tbody.innerHTML = list.map(a => `
         <tr>
-          <td><div style="font-weight:500;">${a.name}</div><div class="td-secondary">${a.email}</div></td>
-          <td><span class="td-mono">${a.promo_code}</span></td>
-          <td>${a.code_uses ?? 0}</td>
-          <td class="text-gold">${formatCurrency(a.total_commission)}</td>
-          <td><span class="badge ${a.status === 'active' ? 'badge-active' : 'badge-inactive'}"><span class="badge-dot"></span>${a.status}</span></td>
+          <td data-label="Name"><div style="font-weight:500;">${a.name}</div><div class="td-secondary">${a.email}</div></td>
+          <td data-label="Promo Code"><span class="td-mono">${a.promo_code}</span></td>
+          <td data-label="Uses">${a.code_uses ?? 0}</td>
+          <td data-label="Commission" class="text-gold">${formatCurrency(a.total_commission)}</td>
+          <td data-label="Status"><span class="badge ${a.status === 'active' ? 'badge-active' : 'badge-inactive'}"><span class="badge-dot"></span>${a.status}</span></td>
         </tr>
       `).join('');
     }
@@ -570,10 +570,10 @@
       }
       tbody.innerHTML = list.map(c => `
         <tr>
-          <td style="font-weight:500;">${c.affiliators?.name || '—'}</td>
-          <td class="text-green" style="font-weight:600;">${formatCurrency(c.amount)}</td>
-          <td class="td-secondary">${c.note || '—'}</td>
-          <td class="td-secondary">${formatDateTime(c.payment_date)}</td>
+          <td data-label="Affiliator" style="font-weight:500;">${c.affiliators?.name || '—'}</td>
+          <td data-label="Amount" class="text-green" style="font-weight:600;">${formatCurrency(c.amount)}</td>
+          <td data-label="Note" class="td-secondary">${c.note || '—'}</td>
+          <td data-label="Date" class="td-secondary">${formatDateTime(c.payment_date)}</td>
         </tr>
       `).join('');
     }
