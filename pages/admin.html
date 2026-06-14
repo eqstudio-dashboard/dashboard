@@ -482,12 +482,23 @@
       const sb    = getSupabase();
       const email = usernameToEmail(username);
 
+      // Save admin session BEFORE creating new user (signUp will replace session)
+      const { data: { session: adminSession } } = await sb.auth.getSession();
+
       try {
-        // Sign up with fake internal email — no confirmation email sent
+        // Create affiliator auth account
         const { data: authData, error: authErr } = await sb.auth.signUp({ email, password });
         if (authErr) throw authErr;
 
         const userId = authData.user?.id;
+
+        // Immediately restore admin session so we don't get kicked out
+        if (adminSession) {
+          await sb.auth.setSession({
+            access_token: adminSession.access_token,
+            refresh_token: adminSession.refresh_token
+          });
+        }
 
         const { error: dbErr } = await sb.from('affiliators').insert({
           user_id: userId, name, email, username, promo_code: promo, contact, status: 'active'
