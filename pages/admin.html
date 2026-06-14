@@ -710,6 +710,22 @@
       renderAdminAnnouncements(announcementsData);
     }
 
+    // Format plain text → HTML: preserve paragraphs and bullet points
+    function formatContent(text) {
+      if (!text) return '';
+      return text
+        .split('\n')
+        .map(line => {
+          const trimmed = line.trim();
+          if (!trimmed) return '<br>';
+          if (/^[-*•]\s+/.test(trimmed)) {
+            return '<span style="display:block;padding-left:16px;position:relative;margin:2px 0;"><span style="position:absolute;left:0;color:var(--gold);">•</span>' + trimmed.replace(/^[-*•]\s+/, '') + '</span>';
+          }
+          return '<span style="display:block;margin:2px 0;">' + trimmed + '</span>';
+        })
+        .join('');
+    }
+
     function renderAdminAnnouncements(list) {
       const feed = document.getElementById('adminAnnouncementFeed');
       if (!list.length) {
@@ -735,7 +751,7 @@
               </button>
             </div>
           </div>
-          <div class="announcement-content">${a.content}</div>
+          <div class="announcement-content" style="white-space:normal;">${formatContent(a.content)}</div>
         </div>
       `).join('');
     }
