@@ -160,6 +160,7 @@
                     <th>Affiliator</th>
                     <th>Promo Code</th>
                     <th>Uses</th>
+                    <th>Badge</th>
                     <th>Commission</th>
                     <th>Last Active</th>
                     <th>Status</th>
@@ -363,6 +364,22 @@
       loadAll();
     });
 
+    // Milestone badge helper
+    const MILESTONES = [
+      { emoji: '👑', title: 'Elite',        threshold: 25 },
+      { emoji: '🔥', title: 'Top Performer', threshold: 25 },
+      { emoji: '⭐', title: 'Rising Star',   threshold: 5  },
+      { emoji: '🎯', title: 'First Sale',    threshold: 1  },
+    ];
+    function getCurrentBadge(uses) {
+      const u = uses || 0;
+      if (u >= 25) return '👑 Elite';
+      if (u >= 10) return '🔥 Top Performer';
+      if (u >= 5)  return '⭐ Rising Star';
+      if (u >= 1)  return '🎯 First Sale';
+      return '—';
+    }
+
     async function loadAll() {
       await Promise.all([loadAffiliators(), loadCommissions(), loadAnnouncements()]);
       updateOverviewStats();
@@ -394,7 +411,7 @@
     function renderAffiliators(list) {
       const tbody = document.getElementById('affiliatorsTableBody');
       if (!list.length) {
-        tbody.innerHTML = `<tr><td colspan="7"><div class="empty-state"><div class="empty-state-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><h3>No affiliators yet</h3><p>Add your first affiliator to get started.</p></div></td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="empty-state-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><h3>No affiliators yet</h3><p>Add your first affiliator to get started.</p></div></td></tr>`;
         return;
       }
       tbody.innerHTML = list.map(a => `
@@ -406,6 +423,7 @@
           </td>
           <td data-label="Promo Code"><span class="td-mono">${a.promo_code}</span></td>
           <td data-label="Uses">${a.code_uses ?? 0}</td>
+          <td data-label="Badge" style="white-space:nowrap;">${getCurrentBadge(a.code_uses)}</td>
           <td data-label="Commission" class="text-gold" style="font-weight:600;">${formatCurrency(a.total_commission)}</td>
           <td data-label="Last Active" class="td-secondary">${timeAgo(a.last_active)}</td>
           <td data-label="Status"><span class="badge ${a.status === 'active' ? 'badge-active' : 'badge-inactive'}"><span class="badge-dot"></span>${a.status}</span></td>
