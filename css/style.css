@@ -44,6 +44,88 @@
   --font-display: 'Syne', system-ui, sans-serif;
 }
 
+/* ── Light Mode ── */
+[data-theme="light"] {
+  --bg-base:       #f5f5f0;
+  --bg-surface:    #ffffff;
+  --bg-elevated:   #f0ede8;
+  --bg-hover:      #e8e5e0;
+
+  --border:        rgba(0,0,0,0.08);
+  --border-strong: rgba(0,0,0,0.15);
+
+  --gold:          #a07830;
+  --gold-bright:   #b88c38;
+  --gold-muted:    rgba(160,120,48,0.15);
+  --gold-dim:      rgba(160,120,48,0.08);
+
+  --text-primary:   #1a1a1a;
+  --text-secondary: #555555;
+  --text-tertiary:  #999999;
+
+  --green:         #2d8a5e;
+  --green-muted:   rgba(45,138,94,0.1);
+  --red:           #c0392b;
+  --red-muted:     rgba(192,57,43,0.1);
+
+  --shadow-card: 0 1px 3px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.06);
+  --shadow-gold: 0 0 24px rgba(160,120,48,0.1);
+}
+
+/* ── Theme transition ── */
+body, .sidebar, .card, .stat-card, .modal, .topbar, .announcement-item,
+.badge-card, .progress-card, .resource-card, .promo-display, .field input,
+.field select, .field textarea, .search-input, .nav-item, .btn {
+  transition: background var(--transition-slow), border-color var(--transition-slow),
+              color var(--transition-slow), box-shadow var(--transition-slow) !important;
+}
+
+/* ── Theme toggle button ── */
+.theme-toggle {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 99px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  transition: background var(--transition), border-color var(--transition), color var(--transition);
+  white-space: nowrap;
+}
+.theme-toggle:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-strong);
+  color: var(--text-primary);
+}
+.theme-toggle svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+/* ── Light mode specific overrides ── */
+[data-theme="light"] .sidebar {
+  box-shadow: 1px 0 0 var(--border);
+}
+[data-theme="light"] .topbar {
+  box-shadow: 0 1px 0 var(--border);
+}
+[data-theme="light"] .td-mono {
+  background: rgba(160,120,48,0.1);
+}
+[data-theme="light"] .login-page {
+  background:
+    radial-gradient(ellipse 80% 60% at 50% -20%, rgba(160,120,48,0.06) 0%, transparent 70%),
+    var(--bg-base);
+}
+[data-theme="light"] .badge-card.unlocked {
+  background: linear-gradient(135deg, rgba(160,120,48,0.06) 0%, var(--bg-elevated) 100%);
+}
+[data-theme="light"] .announcement-item.pinned {
+  background: linear-gradient(135deg, rgba(160,120,48,0.04) 0%, var(--bg-elevated) 100%);
+}
+[data-theme="light"] ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); }
+
 /* ── Reset ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
