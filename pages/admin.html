@@ -30,6 +30,66 @@
     }
     .inline-edit input:focus { border-color: var(--gold); }
     .announce-item-actions { display: flex; gap: 6px; align-items: center; }
+    .mkt-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 16px;
+    }
+    .mkt-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      cursor: pointer;
+      transition: border-color var(--transition), transform var(--transition);
+    }
+    .mkt-card:hover { border-color: var(--border-strong); transform: translateY(-2px); }
+    .mkt-thumb {
+      width: 100%; height: 140px;
+      object-fit: cover; display: block;
+      background: var(--bg-elevated);
+    }
+    .mkt-thumb-placeholder {
+      width: 100%; height: 140px;
+      background: var(--bg-elevated);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .mkt-card-body { padding: 14px 16px; }
+    .mkt-card-title {
+      font-size: 0.85rem; font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .mkt-card-meta {
+      display: flex; gap: 6px; flex-wrap: wrap;
+    }
+    .mkt-tag {
+      font-size: 0.62rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: 2px 7px;
+      border-radius: 99px;
+      background: var(--gold-dim);
+      color: var(--gold);
+      border: 1px solid rgba(201,164,74,0.18);
+    }
+    .mkt-card-actions {
+      display: flex; gap: 6px;
+      padding: 0 16px 14px;
+      justify-content: flex-end;
+    }
+    @media (max-width: 768px) {
+      .mkt-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+      .mkt-thumb, .mkt-thumb-placeholder { height: 100px; }
+    }
+    @media (max-width: 390px) {
+      .mkt-grid { grid-template-columns: 1fr 1fr; }
+    }
   </style>
 </head>
 <body>
@@ -75,6 +135,10 @@
         <button class="nav-item" id="nav-updates" onclick="showSection('updates')">
           <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/></svg>
           Updates
+        </button>
+        <button class="nav-item" id="nav-marketing" onclick="showSection('marketing')">
+          <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3 11l18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/></svg>
+          Marketing Strategy
         </button>
       </div>
 
@@ -268,6 +332,89 @@
     </main>
   </div>
 
+
+
+  <!-- ═══ MODAL: Add/Edit Marketing Strategy ═══ -->
+  <div class="modal-overlay" id="marketingFormModal">
+    <div class="modal" style="max-width:560px;">
+      <div class="modal-header">
+        <span class="modal-title" id="mktModalTitle">New Marketing Strategy</span>
+        <button class="modal-close" onclick="closeModal('marketingFormModal')">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <input type="hidden" id="mktEditId">
+
+      <div class="field"><label>Title</label><input type="text" id="mktTitle" placeholder="e.g. Instagram Story Promo Pack"></div>
+
+      <div class="field"><label>Thumbnail Image (shown on grid card)</label>
+        <div style="border:2px dashed var(--border);border-radius:var(--radius-md);padding:16px;text-align:center;cursor:pointer;" id="mktThumbDropZone" onclick="document.getElementById('mktThumbUpload').click()" ondragover="event.preventDefault();this.style.borderColor='var(--gold)'" ondragleave="this.style.borderColor=''" ondrop="handleMktImageDrop(event,'thumb')">
+          <input type="file" id="mktThumbUpload" accept=".jpg,.jpeg,.png,.webp" style="display:none;" onchange="handleMktImageSelect(this,'thumb')">
+          <div id="mktThumbPreviewWrap" style="display:none;">
+            <img id="mktThumbPreview" style="max-width:100%;max-height:140px;border-radius:var(--radius-sm);object-fit:cover;">
+            <button onclick="clearMktImage(event,'thumb')" style="display:block;margin:8px auto 0;background:var(--red-muted);border:1px solid rgba(224,92,92,0.2);color:var(--red);padding:4px 12px;border-radius:var(--radius-sm);cursor:pointer;font-size:0.75rem;">Remove</button>
+          </div>
+          <div id="mktThumbPrompt">
+            <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" style="margin:0 auto 6px;display:block;color:var(--text-tertiary);"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            <p style="font-size:0.78rem;color:var(--text-secondary);">Click or drag to upload thumbnail</p>
+          </div>
+        </div>
+        <input type="hidden" id="mktThumbUrl">
+      </div>
+
+      <div class="field"><label>Copywriting</label><textarea id="mktCopy" placeholder="Write the caption / copy affiliators can use…" style="min-height:110px;"></textarea></div>
+
+      <div class="field"><label>Link (optional)</label><input type="text" id="mktLink" placeholder="https://…"></div>
+
+      <div class="field"><label>Additional Image (optional — full image inside the strategy)</label>
+        <div style="border:2px dashed var(--border);border-radius:var(--radius-md);padding:16px;text-align:center;cursor:pointer;" id="mktImageDropZone" onclick="document.getElementById('mktImageUpload').click()" ondragover="event.preventDefault();this.style.borderColor='var(--gold)'" ondragleave="this.style.borderColor=''" ondrop="handleMktImageDrop(event,'image')">
+          <input type="file" id="mktImageUpload" accept=".jpg,.jpeg,.png,.webp" style="display:none;" onchange="handleMktImageSelect(this,'image')">
+          <div id="mktImagePreviewWrap" style="display:none;">
+            <img id="mktImagePreview" style="max-width:100%;max-height:140px;border-radius:var(--radius-sm);object-fit:cover;">
+            <button onclick="clearMktImage(event,'image')" style="display:block;margin:8px auto 0;background:var(--red-muted);border:1px solid rgba(224,92,92,0.2);color:var(--red);padding:4px 12px;border-radius:var(--radius-sm);cursor:pointer;font-size:0.75rem;">Remove</button>
+          </div>
+          <div id="mktImagePrompt">
+            <p style="font-size:0.78rem;color:var(--text-secondary);">Click or drag to upload image</p>
+          </div>
+        </div>
+        <input type="hidden" id="mktImageUrl">
+      </div>
+
+      <div class="field"><label>Video</label>
+        <div style="display:flex;gap:8px;margin-bottom:8px;">
+          <select id="mktVideoType" onchange="toggleMktVideoInput()" style="flex-shrink:0;width:140px;">
+            <option value="">No video</option>
+            <option value="embed">YouTube/Vimeo link</option>
+            <option value="file">Upload video file</option>
+          </select>
+          <input type="text" id="mktVideoEmbed" placeholder="https://youtube.com/watch?v=…" style="display:none;flex:1;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius-md);padding:11px 14px;color:var(--text-primary);font-size:0.9rem;">
+        </div>
+        <div id="mktVideoFileWrap" style="display:none;">
+          <input type="file" id="mktVideoUpload" accept="video/mp4,video/webm,video/quicktime" onchange="handleMktVideoSelect(this)">
+          <div id="mktVideoFileName" style="font-size:0.78rem;color:var(--text-tertiary);margin-top:6px;"></div>
+        </div>
+        <input type="hidden" id="mktVideoUrl">
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('marketingFormModal')">Cancel</button>
+        <button class="btn btn-primary" id="saveMktBtn" onclick="saveMarketingStrategy()" style="width:auto;">Save Strategy</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ MODAL: View Marketing Strategy (Expanded) ═══ -->
+  <div class="modal-overlay" id="marketingViewModal">
+    <div class="modal" style="max-width:640px;">
+      <div class="modal-header">
+        <span class="modal-title" id="mktViewTitle">Strategy</span>
+        <button class="modal-close" onclick="closeModal('marketingViewModal')">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div id="mktViewBody"></div>
+    </div>
+  </div>
 
   <!-- ═══ MODAL: Add/Edit Update ═══ -->
   <div class="modal-overlay" id="addUpdateModal">
@@ -472,13 +619,13 @@
     }
 
     async function loadAll() {
-      await Promise.all([loadAffiliators(), loadCommissions(), loadAnnouncements(), loadUpdates()]);
+      await Promise.all([loadAffiliators(), loadCommissions(), loadAnnouncements(), loadUpdates(), loadMarketing()]);
       updateOverviewStats();
     }
 
     // ── Navigation ──
     function showSection(name) {
-      ['overview','affiliators','commissions','announcements','updates'].forEach(s => {
+      ['overview','affiliators','commissions','announcements','updates','marketing'].forEach(s => {
         document.getElementById('section-' + s).style.display = s === name ? '' : 'none';
         document.getElementById('nav-' + s)?.classList.toggle('active', s === name);
       });
@@ -1141,6 +1288,273 @@
       if (error) { toast('Delete failed', 'error'); return; }
       toast('Update deleted', 'success');
       await loadUpdates();
+    }
+
+
+    // ══════════════════════════════════════════
+    // MARKETING STRATEGY
+    // ══════════════════════════════════════════
+    let marketingData = [];
+    let mktThumbFile = null;
+    let mktImageFile = null;
+    let mktVideoFile = null;
+
+    async function loadMarketing() {
+      const sb = getSupabase();
+      const { data, error } = await sb.from('marketing_strategies')
+        .select('*').order('created_at', { ascending: false });
+      if (error) { toast('Error loading marketing strategies', 'error'); return; }
+      marketingData = data || [];
+      renderMarketingGrid();
+    }
+
+    function renderMarketingGrid() {
+      const grid = document.getElementById('adminMarketingGrid');
+      if (!marketingData.length) {
+        grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><div class="empty-state-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M3 11l18-5v12L3 14v-3z"/></svg></div><h3>No strategies yet</h3><p>Add your first marketing strategy for affiliators.</p></div>';
+        return;
+      }
+      grid.innerHTML = marketingData.map(m => `
+        <div class="mkt-card" onclick="viewMarketingStrategy('${m.id}')">
+          ${m.thumbnail_url
+            ? `<img src="${m.thumbnail_url}" class="mkt-thumb" onerror="this.outerHTML='<div class=&quot;mkt-thumb-placeholder&quot;><span style=&quot;font-family:var(--font-display);font-weight:800;color:var(--gold);&quot;>EQStudio</span></div>'">`
+            : `<div class="mkt-thumb-placeholder"><span style="font-family:var(--font-display);font-weight:800;color:var(--gold);">EQStudio</span></div>`
+          }
+          <div class="mkt-card-body">
+            <div class="mkt-card-title">${m.title}</div>
+            <div class="mkt-card-meta">
+              ${m.copywriting ? '<span class="mkt-tag">Copy</span>' : ''}
+              ${m.link_url ? '<span class="mkt-tag">Link</span>' : ''}
+              ${m.image_url ? '<span class="mkt-tag">Image</span>' : ''}
+              ${m.video_url ? '<span class="mkt-tag">Video</span>' : ''}
+            </div>
+          </div>
+        </div>
+      `).join('') + `<div style="display:none;" id="mktActionsTemplate"></div>`;
+
+      // Add edit/delete buttons via a separate pass appended to each card (event-safe)
+      const cards = grid.querySelectorAll('.mkt-card');
+      cards.forEach((card, i) => {
+        const m = marketingData[i];
+        const actions = document.createElement('div');
+        actions.className = 'mkt-card-actions';
+        actions.onclick = (e) => e.stopPropagation();
+        actions.innerHTML = `
+          <button class="btn btn-ghost btn-icon btn-sm" onclick="event.stopPropagation();openMarketingModal('${m.id}')" title="Edit">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+          <button class="btn btn-danger btn-icon btn-sm" onclick="event.stopPropagation();deleteMarketingStrategy('${m.id}')" title="Delete">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>
+          </button>
+        `;
+        card.appendChild(actions);
+      });
+    }
+
+    function viewMarketingStrategy(id) {
+      const m = marketingData.find(x => x.id === id);
+      if (!m) return;
+      document.getElementById('mktViewTitle').textContent = m.title;
+
+      let videoHtml = '';
+      if (m.video_url && m.video_type === 'embed') {
+        const embedUrl = toEmbedUrl(m.video_url);
+        videoHtml = `<div style="position:relative;padding-bottom:56.25%;height:0;border-radius:var(--radius-md);overflow:hidden;margin-bottom:16px;"><iframe src="${embedUrl}" style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;" allowfullscreen></iframe></div>`;
+      } else if (m.video_url && m.video_type === 'file') {
+        videoHtml = `<video src="${m.video_url}" controls style="width:100%;border-radius:var(--radius-md);margin-bottom:16px;max-height:360px;background:#000;"></video>`;
+      }
+
+      document.getElementById('mktViewBody').innerHTML = `
+        ${videoHtml}
+        ${m.image_url ? `<img src="${m.image_url}" style="width:100%;border-radius:var(--radius-md);margin-bottom:16px;max-height:320px;object-fit:cover;">` : ''}
+        ${m.copywriting ? `<div style="font-size:0.85rem;color:var(--text-secondary);line-height:1.7;white-space:pre-wrap;background:var(--bg-elevated);border:1px solid var(--border);border-radius:var(--radius-md);padding:14px 16px;margin-bottom:16px;">${m.copywriting}</div>` : ''}
+        ${m.link_url ? `<a href="${m.link_url}" target="_blank" rel="noopener" class="btn btn-gold-outline" style="width:100%;margin-bottom:8px;"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> Open Link</a>` : ''}
+      `;
+      openModal('marketingViewModal');
+    }
+
+    function toEmbedUrl(url) {
+      // YouTube
+      let m = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]+)/);
+      if (m) return `https://www.youtube.com/embed/${m[1]}`;
+      // Vimeo
+      m = url.match(/vimeo\.com\/(\d+)/);
+      if (m) return `https://player.vimeo.com/video/${m[1]}`;
+      return url;
+    }
+
+    function openMarketingModal(id) {
+      resetMarketingForm();
+      if (id) {
+        const m = marketingData.find(x => x.id === id);
+        if (!m) return;
+        document.getElementById('mktEditId').value = m.id;
+        document.getElementById('mktTitle').value  = m.title;
+        document.getElementById('mktCopy').value   = m.copywriting || '';
+        document.getElementById('mktLink').value   = m.link_url || '';
+        document.getElementById('mktModalTitle').textContent = 'Edit Strategy';
+
+        if (m.thumbnail_url) {
+          document.getElementById('mktThumbUrl').value = m.thumbnail_url;
+          document.getElementById('mktThumbPreview').src = m.thumbnail_url;
+          document.getElementById('mktThumbPreviewWrap').style.display = '';
+          document.getElementById('mktThumbPrompt').style.display = 'none';
+        }
+        if (m.image_url) {
+          document.getElementById('mktImageUrl').value = m.image_url;
+          document.getElementById('mktImagePreview').src = m.image_url;
+          document.getElementById('mktImagePreviewWrap').style.display = '';
+          document.getElementById('mktImagePrompt').style.display = 'none';
+        }
+        if (m.video_url) {
+          document.getElementById('mktVideoType').value = m.video_type;
+          document.getElementById('mktVideoUrl').value = m.video_url;
+          toggleMktVideoInput();
+          if (m.video_type === 'embed') document.getElementById('mktVideoEmbed').value = m.video_url;
+          if (m.video_type === 'file') document.getElementById('mktVideoFileName').textContent = 'Current video uploaded ✓';
+        }
+      }
+      openModal('marketingFormModal');
+    }
+
+    function resetMarketingForm() {
+      document.getElementById('mktEditId').value = '';
+      document.getElementById('mktTitle').value  = '';
+      document.getElementById('mktCopy').value   = '';
+      document.getElementById('mktLink').value   = '';
+      document.getElementById('mktModalTitle').textContent = 'New Marketing Strategy';
+      document.getElementById('mktThumbUrl').value = '';
+      document.getElementById('mktImageUrl').value = '';
+      document.getElementById('mktVideoUrl').value = '';
+      document.getElementById('mktVideoType').value = '';
+      document.getElementById('mktVideoEmbed').value = '';
+      document.getElementById('mktVideoFileName').textContent = '';
+      mktThumbFile = null; mktImageFile = null; mktVideoFile = null;
+      clearMktImage({ stopPropagation: () => {} }, 'thumb');
+      clearMktImage({ stopPropagation: () => {} }, 'image');
+      toggleMktVideoInput();
+    }
+
+    function toggleMktVideoInput() {
+      const type = document.getElementById('mktVideoType').value;
+      document.getElementById('mktVideoEmbed').style.display   = type === 'embed' ? '' : 'none';
+      document.getElementById('mktVideoFileWrap').style.display = type === 'file'  ? '' : 'none';
+    }
+
+    function handleMktImageSelect(input, kind) {
+      const file = input.files[0];
+      if (!file) return;
+      if (file.size > 5 * 1024 * 1024) { toast('Image must be under 5MB', 'error'); return; }
+      if (kind === 'thumb') mktThumbFile = file; else mktImageFile = file;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        document.getElementById('mkt' + (kind === 'thumb' ? 'Thumb' : 'Image') + 'Preview').src = e.target.result;
+        document.getElementById('mkt' + (kind === 'thumb' ? 'Thumb' : 'Image') + 'PreviewWrap').style.display = '';
+        document.getElementById('mkt' + (kind === 'thumb' ? 'Thumb' : 'Image') + 'Prompt').style.display = 'none';
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function handleMktImageDrop(e, kind) {
+      e.preventDefault();
+      e.currentTarget.style.borderColor = '';
+      const file = e.dataTransfer.files[0];
+      if (file && file.type.startsWith('image/')) {
+        const dt = new DataTransfer();
+        dt.items.add(file);
+        const inputId = kind === 'thumb' ? 'mktThumbUpload' : 'mktImageUpload';
+        document.getElementById(inputId).files = dt.files;
+        handleMktImageSelect(document.getElementById(inputId), kind);
+      }
+    }
+
+    function clearMktImage(e, kind) {
+      e.stopPropagation();
+      if (kind === 'thumb') mktThumbFile = null; else mktImageFile = null;
+      const prefix = kind === 'thumb' ? 'mktThumb' : 'mktImage';
+      document.getElementById(prefix + 'Url').value = '';
+      const wrap = document.getElementById(prefix + 'PreviewWrap');
+      const prompt = document.getElementById(prefix + 'Prompt');
+      if (wrap) wrap.style.display = 'none';
+      if (prompt) prompt.style.display = '';
+    }
+
+    function handleMktVideoSelect(input) {
+      const file = input.files[0];
+      if (!file) return;
+      if (file.size > 50 * 1024 * 1024) { toast('Video must be under 50MB', 'error'); return; }
+      mktVideoFile = file;
+      document.getElementById('mktVideoFileName').textContent = `Selected: ${file.name}`;
+    }
+
+    async function uploadMktFile(file, prefix) {
+      if (!file) return null;
+      const sb   = getSupabase();
+      const ext  = file.name.split('.').pop();
+      const path = `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+      const { error } = await sb.storage.from('marketing-assets').upload(path, file, { upsert: true });
+      if (error) throw new Error('Upload failed: ' + error.message);
+      const { data } = sb.storage.from('marketing-assets').getPublicUrl(path);
+      return data.publicUrl;
+    }
+
+    async function saveMarketingStrategy() {
+      const id    = document.getElementById('mktEditId').value;
+      const title = document.getElementById('mktTitle').value.trim();
+      const copy  = document.getElementById('mktCopy').value.trim();
+      const link  = document.getElementById('mktLink').value.trim();
+      const videoType = document.getElementById('mktVideoType').value;
+      const btn   = document.getElementById('saveMktBtn');
+
+      if (!title) { toast('Title is required', 'error'); return; }
+      setButtonLoading(btn, true);
+
+      try {
+        const thumbUrl = mktThumbFile ? await uploadMktFile(mktThumbFile, 'thumb') : (document.getElementById('mktThumbUrl').value || null);
+        const imageUrl = mktImageFile ? await uploadMktFile(mktImageFile, 'image') : (document.getElementById('mktImageUrl').value || null);
+
+        let videoUrl = null;
+        if (videoType === 'embed') {
+          videoUrl = document.getElementById('mktVideoEmbed').value.trim() || null;
+        } else if (videoType === 'file') {
+          videoUrl = mktVideoFile ? await uploadMktFile(mktVideoFile, 'video') : (document.getElementById('mktVideoUrl').value || null);
+        }
+
+        const user = await getCurrentUser();
+        const payload = {
+          title, copywriting: copy, link_url: link || null,
+          thumbnail_url: thumbUrl, image_url: imageUrl,
+          video_url: videoUrl, video_type: videoType || null,
+          created_by: user?.id
+        };
+
+        const sb = getSupabase();
+        if (id) {
+          const { error } = await sb.from('marketing_strategies').update(payload).eq('id', id);
+          if (error) throw error;
+          toast('Strategy updated!', 'success');
+        } else {
+          const { error } = await sb.from('marketing_strategies').insert(payload);
+          if (error) throw error;
+          toast('Strategy added!', 'success');
+        }
+
+        closeModal('marketingFormModal');
+        await loadMarketing();
+      } catch (err) {
+        toast(err.message || 'Failed to save', 'error');
+      } finally {
+        setButtonLoading(btn, false);
+      }
+    }
+
+    async function deleteMarketingStrategy(id) {
+      if (!confirmAction('Delete this marketing strategy?')) return;
+      const sb = getSupabase();
+      const { error } = await sb.from('marketing_strategies').delete().eq('id', id);
+      if (error) { toast('Delete failed', 'error'); return; }
+      toast('Strategy deleted', 'success');
+      await loadMarketing();
     }
 
     // Close modal on overlay click
